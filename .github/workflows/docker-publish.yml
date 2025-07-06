@@ -30,3 +30,16 @@ jobs:
       - name: Notify server for deployment
         run: |
           curl -X POST http://94.156.102.44:9000/hooks/secret-santa
+
+      - name: Update submodule in parent repo
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "ci@github.com"
+
+          git clone https://x-access-token:${{ secrets.PARENT_REPO_TOKEN }}@github.com/dimachizh123/DimaChizhProjects.git
+          cd DimaChizhProjects
+
+          git submodule update --remote secret-santa
+          git add secret-santa
+          git commit -m "Update submodule secret-santa"
+          git push
