@@ -26,7 +26,7 @@ async def start(message: Message, command: CommandObject, state: FSMContext):
             await state.update_data(code=payload)
             await state.set_state(User.username)
         else:
-            await message.answer("К сожалению, такая комната не найдена")
+            await message.answer("Ошибка! Не найдено")
     else:
         await message.answer(f'Привет!\nДанный бот реализует игру "Тайный Санта"', reply_markup=KB.room_manager)
 
