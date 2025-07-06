@@ -27,11 +27,11 @@ async def add_user(code: int, user_id: int, username: str, bot: Bot) -> str:
         old_user = await user_cursor.fetchone()
         if not old_user:
             await notify_admin(f"В комнату добавлен участник {username}", admin_id, bot, room_name, user_id)
-            return "Ваши данные были обновлены!"
+            return "Вы были успешно добавлены в комнату!"
         else:
             old_username = old_user[2]
             await notify_admin(f"Участник {old_username} изменил имя на {username}", admin_id, bot, room_name, user_id)
-            return "Вы были успешно добавлены в комнату!"
+            return "Ваши данные были обновлены!"
 
 async def get_users_list(room_id: int) -> list[tuple[int, str]]:
     async with connect_db() as db:
