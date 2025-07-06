@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
-from app.db.rooms import get_room_name_code
+from app.db.rooms import get_room_name_code, check_room
 from app.db.users import get_rooms, show_room
 from app.keyboards import KeyboardFactory as KB
 from app.handlers.join_room import User
@@ -21,9 +21,11 @@ async def start(message: Message, command: CommandObject, state: FSMContext):
             await message.answer(f'Некорректная ссылка!')
             return
         await message.answer(f'Привет!\nДанный бот реализует игру "Тайный Санта"')
-        await message.answer(f'Сейчас присоединим тебя в комнату: {await get_room_name_code(payload)}\nВведи своё имя', reply_markup=KB.use_tg_name)
-        await state.update_data(code=payload)
-        await state.set_state(User.username)
+        if check_room(payload):
+            await message.answer(f'Сейчас присоединим тебя в комнату: {await get_room_name_code(payload)}\nВведи своё имя', reply_markup=KB.use_tg_name)
+            await state.update_data(code=payload)
+            await state.set_state(User.username)
+        await message.answer("К сожалению, такая комната не найдена")
     else:
         await message.answer(f'Привет!\nДанный бот реализует игру "Тайный Санта"', reply_markup=KB.room_manager)
 
