@@ -20,7 +20,7 @@ async def start(message: Message, command: CommandObject, state: FSMContext):
         except ValueError:
             await message.answer(f'Некорректная ссылка!')
             return
-        await message.answer(f'Приветик!\nДанный бот реализует игру "Тайный Санта"')
+        await message.answer(f'Злооо!\nДанный бот реализует игру "Тайный Санта"')
         if check_room(payload):
             await message.answer(f'Сейчас присоединим тебя в комнату: {await get_room_name_code(payload)}\nВведи своё имя', reply_markup=KB.use_tg_name)
             await state.update_data(code=payload)
@@ -28,7 +28,7 @@ async def start(message: Message, command: CommandObject, state: FSMContext):
         else:
             await message.answer("Ошибка! Не найдено")
     else:
-        await message.answer(f'Приветули!\nДанный бот реализует игру "Тайный Санта"', reply_markup=KB.room_manager)
+        await message.answer(f'Доброоо!\nДанный бот реализует игру "Тайный Санта"', reply_markup=KB.room_manager)
 
 @router.message(F.text == "Управление комнатами")
 async def manage_rooms(message: Message):
