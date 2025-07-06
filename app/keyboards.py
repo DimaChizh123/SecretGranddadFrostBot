@@ -51,3 +51,9 @@ class KeyboardFactory:
         for user in users:
             builder.add(InlineKeyboardButton(text=user[1], callback_data=make_callback_data("remove", "user", user[0])))
         return builder.adjust(2).as_markup()
+
+    @staticmethod
+    async def quit(user_id: int) -> InlineKeyboardMarkup:
+        return InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Выйти из комнаты", callback_data=make_callback_data("remove", "user", user_id))]
+        ])
