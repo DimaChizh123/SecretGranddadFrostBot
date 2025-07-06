@@ -2,9 +2,7 @@ import os
 from contextlib import asynccontextmanager
 
 import aiosqlite
-from dotenv import load_dotenv
 
-load_dotenv(dotenv_path="app/config.env")
 DB_PATH = os.getenv("DB_PATH", "secret_santa.db")
 
 async def init_db() -> None:

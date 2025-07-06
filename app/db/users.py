@@ -1,3 +1,4 @@
+import logging
 import random
 
 from aiogram import Bot
@@ -7,6 +8,7 @@ from app.db.rooms import get_room_name_id
 from app.db.core import connect_db
 from app.utils.notifiers import notify_admin
 
+logger = logging.getLogger(__name__)
 
 async def add_user(code: int, user_id: int, username: str, bot: Bot) -> str:
     async with connect_db() as db:
@@ -28,10 +30,12 @@ async def add_user(code: int, user_id: int, username: str, bot: Bot) -> str:
         old_user = await user_cursor.fetchone()
         if not old_user:
             await notify_admin(f"В комнату добавлен участник {username}", admin_id, bot, room_name, user_id)
+            logger.info(f"Пользователь добавлен: {user_id} ({username})")
             return "Вы были успешно добавлены в комнату!"
         else:
             old_username = old_user[2]
             await notify_admin(f"Участник {old_username} изменил имя на {username}", admin_id, bot, room_name, user_id)
+            logger.info(f"Пользователь изменён: {user_id} ({old_username} -> {username})")
             return "Ваши данные были обновлены!"
 
 async def get_users_list(room_id: int) -> list[tuple[int, str]]:
@@ -84,6 +88,7 @@ async def remove_user_from_db(user_id: int, room_id: int, bot: Bot) -> None:
         await notify_admin(f"Участник {username[0]} был удалён из комнаты", admin_id, bot, room_name, user_id)
         await db.execute("DELETE FROM users WHERE user = ? AND room_id = ?", (user_id, room_id))
         await db.commit()
+        logger.info(f"Пользователь удалён: {user_id} ({username})")
 
 async def shuffle_names(original: list[str]) -> list[str]:
     while True:

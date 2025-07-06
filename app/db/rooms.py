@@ -1,6 +1,8 @@
 import random
-
+import logging
 from app.db.core import connect_db
+
+logger = logging.getLogger(__name__)
 
 async def add_room(code: int, name: str, admin: int, username: str) -> None:
     async with connect_db() as db:
@@ -11,6 +13,7 @@ async def add_room(code: int, name: str, admin: int, username: str) -> None:
             raise ValueError("Комната не найдена")
         await db.execute("INSERT INTO users (room_id, user, username) VALUES (?, ?, ?) ON CONFLICT (room_id, user) DO UPDATE SET username = excluded.username", (row[0], admin, username))
         await db.commit()
+        logger.info(f"Комната создана: {name} [{code}] админ {admin}")
 
 async def check_room(code: int) -> bool:
     async with connect_db() as db:
@@ -45,3 +48,4 @@ async def delete_room_from_db(room_id: int) -> None:
         await db.execute("DELETE FROM rooms WHERE id = ?", (room_id,))
         await db.execute("DELETE FROM users WHERE room_id = ?", (room_id,))
         await db.commit()
+        logger.info(f"Комната удалена: {room_id}")

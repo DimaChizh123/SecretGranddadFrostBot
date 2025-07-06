@@ -1,4 +1,6 @@
 import asyncio
+import sys
+
 from aiogram import Bot, Dispatcher
 
 from app.db.core import init_db
@@ -15,14 +17,14 @@ async def main():
     TOKEN = os.getenv("BOT_TOKEN")
     if not TOKEN:
         logger.critical("BOT_TOKEN не найден")
-        exit(1)
+        sys.exit(1)
 
     try:
         await init_db()
         logger.info("БД успешно инициализирована")
     except Exception as e:
         logger.exception(f"Ошибка при инициализации БД: {e}")
-        exit(1)
+        sys.exit(1)
 
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
