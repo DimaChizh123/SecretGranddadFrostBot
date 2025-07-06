@@ -76,7 +76,7 @@ async def remove_user_from_db(user_id: int, room_id: int, bot: Bot) -> None:
         room_row = await room_cursor.fetchone()
         if not room_row:
             return
-        admin_id, room_name = await room_cursor.fetchone()
+        admin_id, room_name = room_row
         user_cursor = await db.execute("SELECT username FROM users WHERE id = ? AND room_id = ?", (user_id, room_id))
         username = await user_cursor.fetchone()
         if not username:
