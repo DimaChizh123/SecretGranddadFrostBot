@@ -5,27 +5,35 @@ from aiogram.utils.deep_linking import create_start_link
 
 from app.db.rooms import get_room_name_id
 from app.db.core import connect_db
+from app.utils.helpers import notify_admin
 
-async def add_user(code: int, user_id: int, username: str) -> str:
+
+async def add_user(code: int, user_id: int, username: str, bot: Bot) -> str:
     async with connect_db() as db:
-        room_cursor = await db.execute("SELECT id FROM rooms WHERE code = ?", (code,))
+        room_cursor = await db.execute("SELECT id, admin, name FROM rooms WHERE code = ?", (code,))
         room_row = await room_cursor.fetchone()
         if not room_row:
             return "Ошибка! Комната не найдена"
-        room_id = room_row[0]
+        room_id, admin_id, room_name = room_row
         username_cursor = await db.execute("SELECT username FROM users WHERE room_id = ?", (room_id,))
         usernames_row = await username_cursor.fetchall()
         usernames = [user[0] for user in usernames_row]
         if username in usernames:
             return "Ошибка! В комнате уже есть участник с таким именем"
-        user_cursor = await db.execute("SELECT room_id, user FROM users WHERE user = ? AND room_id = ?", (user_id, room_id))
+        user_cursor = await db.execute("SELECT room_id, user, username FROM users WHERE user = ? AND room_id = ?", (user_id, room_id))
         await db.execute(
             "INSERT INTO users (room_id, user, username) VALUES (?, ?, ?) ON CONFLICT (room_id, user) DO UPDATE SET username = excluded.username",
             (room_id, user_id, username))
         await db.commit()
-        if await user_cursor.fetchone():
+        old_user = await user_cursor.fetchone()
+        if not old_user:
+            if admin_id != user_id:
+                await notify_admin(f"В комнату добавлен участник {username}", admin_id, bot, room_name)
             return "Ваши данные были обновлены!"
         else:
+            old_username = old_user[2]
+            if admin_id != user_id:
+                await notify_admin(f"Участник {old_username} изменил имя на {username}", admin_id, bot, room_name)
             return "Вы были успешно добавлены в комнату!"
 
 async def get_users_list(room_id: int) -> list[tuple[int, str]]:
