@@ -14,5 +14,7 @@ async def get_room(message: Message, state: FSMContext, user):
     await state.clear()
 
 async def get_user(message: Message, state: FSMContext, user):
-    await message.answer(await add_user(await state.get_value("code"), user, await state.get_value("username")))
+    code = await state.get_value("code")
+    username = await state.get_value("username")
+    await message.answer(await add_user(code, user, username))
     await state.clear()
