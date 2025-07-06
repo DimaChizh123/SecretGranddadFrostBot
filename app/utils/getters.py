@@ -1,4 +1,3 @@
-from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.deep_linking import create_start_link
@@ -19,7 +18,3 @@ async def get_user(message: Message, state: FSMContext, user):
     username = await state.get_value("username")
     await message.answer(await add_user(code, user, username, message.bot))
     await state.clear()
-
-async def notify_admin(message: str, admin_id: int, bot: Bot, room_name: str, user_id: int) -> None:
-    if admin_id != user_id:
-        await bot.send_message(chat_id=admin_id, text=f"Комната {room_name}: {message}")
