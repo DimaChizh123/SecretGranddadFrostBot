@@ -10,7 +10,7 @@ from app.keyboards import KeyboardFactory as KB
 
 router = Router()
 
-@router.callback_query(F.data.startswith("view:admin:"))
+@router.callback_query(F.data.startswith("view_admin:"))
 async def admin_room(call: CallbackQuery):
     data = parse_callback_data(call.data)
     room = data.id
@@ -21,22 +21,23 @@ async def admin_room(call: CallbackQuery):
     else:
         await call.message.answer(message)
 
-@router.callback_query(F.data.startswith("select:user:"))
+@router.callback_query(F.data.startswith("select:"))
 async def remove_user(call: CallbackQuery):
     data = parse_callback_data(call.data)
     user = data.id
     await call.answer()
     await call.message.answer("Выберите участника", reply_markup=await KB.users_list(user))
 
-@router.callback_query(F.data.startswith("remove:user:"))
+@router.callback_query(F.data.startswith("remove:"))
 async def user_removed(call: CallbackQuery):
     data = parse_callback_data(call.data)
     user = data.id
-    await remove_user_from_db(user)
+    room = data.id2
+    await remove_user_from_db(user, room)
     await call.answer()
     await call.message.answer("Пользователь исключён из комнаты!")
 
-@router.callback_query(F.data.startswith("delete:room:"))
+@router.callback_query(F.data.startswith("delete:"))
 async def delete_room(call: CallbackQuery):
     data = parse_callback_data(call.data)
     room = data.id
@@ -44,7 +45,7 @@ async def delete_room(call: CallbackQuery):
     await call.answer()
     await call.message.answer("Комната успешно удалена!")
 
-@router.callback_query(F.data.startswith("run:room:"))
+@router.callback_query(F.data.startswith("run:"))
 async def run_room(call: CallbackQuery):
     data = parse_callback_data(call.data)
     room = data.id

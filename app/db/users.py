@@ -58,9 +58,9 @@ async def get_rooms(user_id: int) -> list[list[tuple[int, str]]]:
         guest_rooms = [(user[0], user[1]) for user in await users_cursor.fetchall()]
         return [admin_rooms, guest_rooms]
 
-async def remove_user_from_db(user_id: int) -> None:
+async def remove_user_from_db(user_id: int, room_id: int) -> None:
     async with connect_db() as db:
-        await db.execute("DELETE FROM users WHERE user = ?", (user_id,))
+        await db.execute("DELETE FROM users WHERE user = ? AND room_id = ?", (user_id, room_id))
         await db.commit()
 
 async def shuffle_names(original: list[str]) -> list[str]:

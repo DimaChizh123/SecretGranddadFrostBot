@@ -34,7 +34,7 @@ async def start(message: Message, command: CommandObject, state: FSMContext):
 async def manage_rooms(message: Message):
     await message.answer("Выбери нужную комнату", reply_markup=await KB.room_list(await get_rooms(message.from_user.id)))
 
-@router.callback_query(F.data.startswith("view:guest:"))
+@router.callback_query(F.data.startswith("view_guest:"))
 async def guest_room(call: CallbackQuery):
     data = parse_callback_data(call.data)
     room = data.id

@@ -28,10 +28,10 @@ class KeyboardFactory:
     def controller(room_id: int) -> InlineKeyboardMarkup:
         return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="Исключить участника", callback_data=make_callback_data("select", "user", room_id)),
-         InlineKeyboardButton(text="Удалить комнату", callback_data=make_callback_data("delete", "room", room_id))
+            InlineKeyboardButton(text="Исключить участника", callback_data=make_callback_data("select",  room_id)),
+         InlineKeyboardButton(text="Удалить комнату", callback_data=make_callback_data("delete", room_id))
         ],
-        [InlineKeyboardButton(text="Запустить", callback_data=make_callback_data("run", "room", room_id))]
+        [InlineKeyboardButton(text="Запустить", callback_data=make_callback_data("run", room_id))]
     ])
 
     @staticmethod
@@ -39,9 +39,9 @@ class KeyboardFactory:
         builder = InlineKeyboardBuilder()
         admin_rooms, guest_rooms = rooms
         for room_id, name in admin_rooms:
-            builder.add(InlineKeyboardButton(text=f"⭐️ {name}", callback_data=make_callback_data("view", "admin", room_id)))
+            builder.add(InlineKeyboardButton(text=f"⭐️ {name}", callback_data=make_callback_data("view_admin", room_id)))
         for room_id, name in guest_rooms:
-            builder.add(InlineKeyboardButton(text=name, callback_data=make_callback_data("view", "guest", room_id)))
+            builder.add(InlineKeyboardButton(text=name, callback_data=make_callback_data("view_guest", room_id)))
         return builder.adjust(2).as_markup()
 
     @staticmethod
@@ -49,11 +49,11 @@ class KeyboardFactory:
         builder = InlineKeyboardBuilder()
         users = (await get_users_list(room_id))[1:]
         for user in users:
-            builder.add(InlineKeyboardButton(text=user[1], callback_data=make_callback_data("remove", "user", user[0])))
+            builder.add(InlineKeyboardButton(text=user[1], callback_data=make_callback_data("remove", user[0], room_id)))
         return builder.adjust(2).as_markup()
 
     @staticmethod
-    async def quit(user_id: int) -> InlineKeyboardMarkup:
+    async def quit(user_id: int, room_id: int) -> InlineKeyboardMarkup:
         return InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Выйти из комнаты", callback_data=make_callback_data("remove", "user", user_id))]
+            [InlineKeyboardButton(text="Выйти из комнаты", callback_data=make_callback_data("remove", user_id, room_id))]
         ])
