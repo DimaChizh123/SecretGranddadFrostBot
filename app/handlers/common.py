@@ -28,7 +28,7 @@ async def start(message: Message, command: CommandObject, state: FSMContext):
         else:
             await message.answer("Ошибка! Не найдено")
     else:
-        await message.answer(f'Злооооо!\nДанный бот реализует игру "Тайный Санта"', reply_markup=KB.room_manager)
+        await message.answer(f'Привет!\nДанный бот реализует игру "Тайный Санта"', reply_markup=KB.room_manager)
 
 @router.message(F.text == "Управление комнатами")
 async def manage_rooms(message: Message):
