@@ -25,3 +25,4 @@ jobs:
           context: .
           push: true
           tags: dimachizh123/secret-santa:latest
+          no-cache: true
