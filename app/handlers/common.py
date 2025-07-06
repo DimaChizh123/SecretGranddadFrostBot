@@ -40,7 +40,7 @@ async def guest_room(call: CallbackQuery):
     room = data.id
     message, code = await show_room(room, call.from_user.id, call.bot)
     await call.answer()
-    await call.message.answer(message, reply_markup=await KB.quit(call.from_user.id))
+    await call.message.answer(message, reply_markup=await KB.quit(call.from_user.id, room))
 
 @router.callback_query(F.data == "tg_name")
 async def tg_name(call: CallbackQuery, state: FSMContext):
