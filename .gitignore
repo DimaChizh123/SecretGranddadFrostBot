@@ -4,5 +4,7 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-config.env
+*.log
+*.env
 *.db
+.DS_Store
