@@ -20,5 +20,6 @@ async def get_user(message: Message, state: FSMContext, user):
     await message.answer(await add_user(code, user, username, message.bot))
     await state.clear()
 
-async def notify_admin(message: str, admin_id: int, bot: Bot, room_name: str) -> None:
-    await bot.send_message(chat_id=admin_id, text=f"Комната {room_name}: {message}")
+async def notify_admin(message: str, admin_id: int, bot: Bot, room_name: str, user_id: int) -> None:
+    if admin_id != user_id:
+        await bot.send_message(chat_id=admin_id, text=f"Комната {room_name}: {message}")

@@ -33,7 +33,7 @@ async def user_removed(call: CallbackQuery):
     data = parse_callback_data(call.data)
     user = data.id
     room = data.id2
-    await remove_user_from_db(user, room)
+    await remove_user_from_db(user, room, call.bot)
     await call.answer()
     await call.message.answer("Пользователь исключён из комнаты!")
 

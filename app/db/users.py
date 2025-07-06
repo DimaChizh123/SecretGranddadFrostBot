@@ -26,13 +26,11 @@ async def add_user(code: int, user_id: int, username: str, bot: Bot) -> str:
         await db.commit()
         old_user = await user_cursor.fetchone()
         if not old_user:
-            if admin_id != user_id:
-                await notify_admin(f"В комнату добавлен участник {username}", admin_id, bot, room_name)
+            await notify_admin(f"В комнату добавлен участник {username}", admin_id, bot, room_name, user_id)
             return "Ваши данные были обновлены!"
         else:
             old_username = old_user[2]
-            if admin_id != user_id:
-                await notify_admin(f"Участник {old_username} изменил имя на {username}", admin_id, bot, room_name)
+            await notify_admin(f"Участник {old_username} изменил имя на {username}", admin_id, bot, room_name, user_id)
             return "Вы были успешно добавлены в комнату!"
 
 async def get_users_list(room_id: int) -> list[tuple[int, str]]:
@@ -71,8 +69,19 @@ async def get_rooms(user_id: int) -> list[list[tuple[int, str]]]:
         guest_rooms = [(user[0], user[1]) for user in await users_cursor.fetchall()]
         return [admin_rooms, guest_rooms]
 
-async def remove_user_from_db(user_id: int, room_id: int) -> None:
+async def remove_user_from_db(user_id: int, room_id: int, bot: Bot) -> None:
+    from app.utils.helpers import notify_admin
     async with connect_db() as db:
+        room_cursor = await db.execute("SELECT admin, name FROM rooms WHERE id = ?", (room_id,))
+        room_row = await room_cursor.fetchone()
+        if not room_row:
+            return
+        admin_id, room_name = await room_cursor.fetchone()
+        user_cursor = await db.execute("SELECT username FROM users WHERE id = ? AND room_id = ?", (user_id, room_id))
+        username = await user_cursor.fetchone()
+        if not username:
+            return
+        await notify_admin(f"Участник {username[0]} был удалён из комнаты", admin_id, bot, room_name, user_id)
         await db.execute("DELETE FROM users WHERE user = ? AND room_id = ?", (user_id, room_id))
         await db.commit()
 
