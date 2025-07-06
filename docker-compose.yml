@@ -1,6 +1,6 @@
 services:
   bot:
-    image: d1mchik/secret-santa-bot
+    image: dimachizh123/secret-santa
     container_name: secret-santa
     env_file:
       - app/config.env

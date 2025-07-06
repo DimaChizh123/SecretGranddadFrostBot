@@ -21,7 +21,7 @@ async def start(message: Message, command: CommandObject, state: FSMContext):
             await message.answer(f'Некорректная ссылка!')
             return
         await message.answer(f'Привет!\nДанный бот реализует игру "Тайный Санта"')
-        await message.answer(f'Сейчас присоединим тебя в комнату: {await get_room_name_code(payload)}\nВведи своё имя')
+        await message.answer(f'Сейчас присоединим тебя в комнату: {await get_room_name_code(payload)}\nВведи своё имя', reply_markup=KB.use_tg_name)
         await state.update_data(code=payload)
         await state.set_state(User.username)
     else:
