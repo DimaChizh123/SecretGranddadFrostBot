@@ -26,3 +26,7 @@ jobs:
           push: true
           tags: dimachizh123/secret-santa:latest
           no-cache: true
+
+      - name: Notify server for deployment
+        run: |
+          curl -X POST http://94.156.102.44:9000/hooks/secret-santa
