@@ -63,7 +63,7 @@ async def show_room(room_id: int, user_id: int, bot: Bot) -> tuple[str, bool]:
         return "Ошибка! Комната пуста или недоступна", False
     result = f"{room[0]} (код: {room[1]})\nСсылка: {link}\nСписок участников:\n"
     for i, (_, name) in enumerate(users):
-        result += f"{'⭐️ ' if i == 0 else ''}{name}\n"
+        result += f"{'⭐️ ' if i == 0 else '👤 '}{name}\n"
     return result, True
 
 async def get_rooms(user_id: int) -> list[list[tuple[int, str]]]:
