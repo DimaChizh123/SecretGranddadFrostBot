@@ -5,10 +5,9 @@ from aiogram.utils.deep_linking import create_start_link
 
 from app.db.rooms import get_room_name_id
 from app.db.core import connect_db
-from app.utils.helpers import notify_admin
-
 
 async def add_user(code: int, user_id: int, username: str, bot: Bot) -> str:
+    from app.utils.helpers import notify_admin
     async with connect_db() as db:
         room_cursor = await db.execute("SELECT id, admin, name FROM rooms WHERE code = ?", (code,))
         room_row = await room_cursor.fetchone()
