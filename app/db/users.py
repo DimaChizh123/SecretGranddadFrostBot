@@ -13,14 +13,20 @@ async def add_user(code: int, user_id: int, username: str) -> str:
         if not room_row:
             return "Ошибка! Комната не найдена"
         room_id = room_row[0]
-        user_cursor = await db.execute("SELECT username FROM users WHERE room_id = ?", (room_id,))
-        usernames_row = await user_cursor.fetchall()
+        username_cursor = await db.execute("SELECT username FROM users WHERE room_id = ?", (room_id,))
+        usernames_row = await username_cursor.fetchall()
         usernames = [user[0] for user in usernames_row]
         if username in usernames:
             return "Ошибка! В комнате уже есть участник с таким именем"
-        await db.execute("INSERT INTO users (room_id, user, username) VALUES (?, ?, ?) ON CONFLICT (room_id, user) DO UPDATE SET username = excluded.username", (room_id, user_id, username))
+        user_cursor = await db.execute("SELECT room_id, user FROM users WHERE user = ? AND room_id = ?", (user_id, room_id))
+        await db.execute(
+            "INSERT INTO users (room_id, user, username) VALUES (?, ?, ?) ON CONFLICT (room_id, user) DO UPDATE SET username = excluded.username",
+            (room_id, user_id, username))
         await db.commit()
-        return "Вы были успешно добавлены в комнату!"
+        if await user_cursor.fetchone():
+            return "Ваши данные были обновлены!"
+        else:
+            return "Вы были успешно добавлены в комнату!"
 
 async def get_users_list(room_id: int) -> list[tuple[int, str]]:
     async with connect_db() as db:
