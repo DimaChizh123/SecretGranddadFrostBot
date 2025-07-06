@@ -15,6 +15,7 @@ async def admin_room(call: CallbackQuery):
     data = parse_callback_data(call.data)
     room = data.id
     message, code = await show_room(room, call.from_user.id, call.bot)
+    await call.answer()
     if code:
         await call.message.answer(message, reply_markup=KB.controller(room))
     else:
@@ -24,6 +25,7 @@ async def admin_room(call: CallbackQuery):
 async def remove_user(call: CallbackQuery):
     data = parse_callback_data(call.data)
     user = data.id
+    await call.answer()
     await call.message.answer("Выберите участника", reply_markup=await KB.users_list(user))
 
 @router.callback_query(F.data.startswith("remove:user:"))
@@ -31,6 +33,7 @@ async def user_removed(call: CallbackQuery):
     data = parse_callback_data(call.data)
     user = data.id
     await remove_user_from_db(user)
+    await call.answer()
     await call.message.answer("Пользователь исключён из комнаты!")
 
 @router.callback_query(F.data.startswith("delete:room:"))
@@ -38,6 +41,7 @@ async def delete_room(call: CallbackQuery):
     data = parse_callback_data(call.data)
     room = data.id
     await delete_room_from_db(room)
+    await call.answer()
     await call.message.answer("Комната успешно удалена!")
 
 @router.callback_query(F.data.startswith("run:room:"))
@@ -45,6 +49,7 @@ async def run_room(call: CallbackQuery):
     data = parse_callback_data(call.data)
     room = data.id
     users_list = await get_users_list(room)
+    await call.answer()
     if not users_list:
         await call.message.answer("Не удалось запустить! Возможно, комната удалена")
         return

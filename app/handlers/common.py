@@ -36,14 +36,13 @@ async def guest_room(call: CallbackQuery):
     data = parse_callback_data(call.data)
     room = data.id
     message, code = await show_room(room, call.from_user.id, call.bot)
-    if code:
-        await call.message.answer(message, reply_markup=KB.controller(room))
-    else:
-        await call.message.answer(message)
+    await call.answer()
+    await call.message.answer(message)
 
 @router.callback_query(F.data == "tg_name")
 async def tg_name(call: CallbackQuery, state: FSMContext):
     await state.update_data(username=f'{call.from_user.first_name or ""} {call.from_user.last_name or ""}')
+    await call.answer()
     if await state.get_value("name"):
         await get_room(call.message, state, call.from_user.id)
     else:

@@ -1,9 +1,9 @@
-version: '3.8'
-
 services:
   bot:
-    image: dimachizh123/secret-santa
+    image: d1mchik/secret-santa-bot
     container_name: secret-santa
     env_file:
       - app/config.env
+    volumes:
+      - ./data/secret_santa.db:/bot/secret_santa.db
     restart: unless-stopped
