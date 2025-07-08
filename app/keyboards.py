@@ -1,5 +1,6 @@
 from typing import ClassVar
 
+from aiogram import Bot
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -45,12 +46,12 @@ class KeyboardFactory:
         return builder.adjust(2).as_markup()
 
     @staticmethod
-    async def users_list(room_id: int) -> InlineKeyboardMarkup:
+    async def users_list(bot: Bot, room_id: int) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
-        users = (await get_users_list(room_id))[1:]
+        users = (await get_users_list(bot, room_id))[1:]
         for user in users:
             builder.add(InlineKeyboardButton(text=user[1], callback_data=make_callback_data("remove", user[0], room_id)))
-        return builder.adjust(2).as_markup()
+        return builder.adjust(1).as_markup()
 
     @staticmethod
     async def quit(user_id: int, room_id: int) -> InlineKeyboardMarkup:

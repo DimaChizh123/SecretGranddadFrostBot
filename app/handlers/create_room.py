@@ -4,7 +4,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 
 from app.keyboards import KeyboardFactory as KB
-from app.utils.getters import get_room
+from app.utils.final_getters import get_room
 
 router = Router()
 

@@ -4,8 +4,9 @@ import random
 from aiogram import Bot
 from aiogram.utils.deep_linking import create_start_link
 
-from app.db.rooms import get_room_name_id
+from app.db.rooms import get_room_name_id, delete_room_from_db
 from app.db.core import connect_db
+from app.utils.getters import get_tg_username
 from app.utils.notifiers import notify_admin
 
 logger = logging.getLogger(__name__)
@@ -17,11 +18,6 @@ async def add_user(code: int, user_id: int, username: str, bot: Bot) -> str:
         if not room_row:
             return "Ошибка! Комната не найдена"
         room_id, admin_id, room_name = room_row
-        username_cursor = await db.execute("SELECT username FROM users WHERE room_id = ?", (room_id,))
-        usernames_row = await username_cursor.fetchall()
-        usernames = [user[0] for user in usernames_row]
-        if username in usernames:
-            return "Ошибка! В комнате уже есть участник с таким именем"
         user_cursor = await db.execute("SELECT room_id, user, username FROM users WHERE user = ? AND room_id = ?", (user_id, room_id))
         await db.execute(
             "INSERT INTO users (room_id, user, username) VALUES (?, ?, ?) ON CONFLICT (room_id, user) DO UPDATE SET username = excluded.username",
@@ -38,16 +34,28 @@ async def add_user(code: int, user_id: int, username: str, bot: Bot) -> str:
             logger.info(f"Пользователь изменён: {user_id} ({old_username} -> {username})")
             return "Ваши данные были обновлены!"
 
-async def get_users_list(room_id: int) -> list[tuple[int, str]]:
+async def get_users_list(bot: Bot, room_id: int) -> list[tuple[int, str]]:
     async with connect_db() as db:
         admin_cursor = await db.execute("SELECT user, username FROM rooms JOIN users ON rooms.id = users.room_id WHERE id = ? AND admin = user", (room_id,))
         admin = await admin_cursor.fetchone()
         if not admin:
             return []
         admin_id, admin_name = admin
+        admin_tg_username = await get_tg_username(bot, admin_id)
         user_cursor = await db.execute("SELECT user, username FROM users WHERE room_id = ? AND user != ?", (room_id, admin_id))
-        users = [(u[0], u[1]) for u in await user_cursor.fetchall()]
-        return [(admin_id, admin_name)] + users
+        users = []
+        for user in await user_cursor.fetchall():
+            user_id, user_name = user
+            user_tg_username = await get_tg_username(bot, user_id)
+            if user_tg_username:
+                users.append((user_id, f"{user_name} ({user_tg_username})"))
+            else:
+                await remove_user_from_db(user_id, room_id, bot)
+        if admin_tg_username:
+            return [(admin_id, f"{admin_name} ({admin_tg_username})")] + users
+        else:
+            await delete_room_from_db(room_id)
+            return [(admin_id, "Админ не найден! Комната будет удалена")] + users
 
 async def show_room(room_id: int, user_id: int, bot: Bot) -> tuple[str, bool]:
     room = await get_room_name_id(room_id)
@@ -58,7 +66,7 @@ async def show_room(room_id: int, user_id: int, bot: Bot) -> tuple[str, bool]:
         if not await cursor.fetchone():
             return "Ошибка! Скорее всего вас исключили из этой комнаты", False
     link = await create_start_link(bot, str(room[1]))
-    users = await get_users_list(room_id)
+    users = await get_users_list(bot, room_id)
     if not users:
         return "Ошибка! Комната пуста или недоступна", False
     result = f"{room[0]} (код: {room[1]})\nСсылка: {link}\nСписок участников:\n"

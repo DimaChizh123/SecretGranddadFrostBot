@@ -8,7 +8,7 @@ from app.db.users import get_rooms, show_room
 from app.keyboards import KeyboardFactory as KB
 from app.handlers.join_room import User
 from app.utils.callback_parser import parse_callback_data
-from app.utils.getters import get_user, get_room
+from app.utils.final_getters import get_user, get_room
 
 router = Router()
 

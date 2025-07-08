@@ -5,7 +5,7 @@ from aiogram.types import Message
 
 from app.db.rooms import check_room, get_room_name_code
 from app.keyboards import KeyboardFactory as KB
-from app.utils.getters import get_user
+from app.utils.final_getters import get_user
 
 router = Router()
 
